@@ -1,0 +1,8 @@
+krakenex
+flask
+requests
+psycopg2
+pyyaml
+flask_cors
+coloredlogs
+validators
