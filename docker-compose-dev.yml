@@ -4,31 +4,41 @@ services:
     build:
       context: .
       dockerfile: docker/postgres/Dockerfile
-    image: asinatra/postgres  
     container_name: postgres
     ports:
       - 5432:5432
     volumes:
-      - /mnt/databases/postgresql/crypto/data:/var/lib/postgresql/data
-      - ./docker/postgres/shared/sql:/docker-entrypoint-initdb.d/
-      - ./docker/postgres/shared/scripts:/usr/local/share/postgresql/scripts/
+      - /var/lib/postgresql/data/pg_data_timescale
+      - ./docker/postgres/backup:/usr/local/share/postgresql/backup
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: crypto-executor
       POSTGRES_USER: executor
       POSTGRES_PORT: 5432
+      PGDATA: /var/lib/postgresql/data/pg_data_timescale
+      
+  crypto-executor:
+    build:
+      context: .
+      dockerfile: docker/executor/Dockerfile
+    image: crypto/executor
+    depends_on: 
+      - pg
+    volumes:
+      - ./logs/executor:/app/logs
+    ports:
+      - 5001:5001
       
   crypto-datacollect:
     build:
       context: .
       dockerfile: docker/datacollect/Dockerfile
-    image: asinatra/datacollect
     depends_on: 
       - pg
     volumes:
       - ./logs/datacollect:/app/logs
     environment:
-      host: postgres
+      host: postgres  
   
   pgadmin:
     image: dpage/pgadmin4
@@ -43,11 +53,21 @@ services:
       - PGADMIN_DEFAULT_EMAIL=test@gmail.com
       - PGADMIN_DEFAULT_PASSWORD=test1234
   
-volumes:
-  pgvol:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    user: "1000"
+    depends_on: 
+      - pg
+    ports:
+      - 3000:3000
+    volumes:  
+      - /var/lib/grafana
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
 
-networks:
-  default:
-    external:
-      name: docker-core_crypto
+volumes:
+  pg_data:
+  pgvol:
  

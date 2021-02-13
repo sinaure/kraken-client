@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Crypto Timescaledb",
+            "Group": "Server Group 1",
+            "Port": 5432,
+            "Username": "executor",
+            "Host": "pg",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "crypto-executor"
+        }
+     }
+}

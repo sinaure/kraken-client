@@ -2,11 +2,12 @@ VERSION=dev
 PROJECT=asinatra
 APP=crypto-executor
 
-build:
-	docker build  -t ${PROJECT}/${APP}:${VERSION} .
-push:
+build-executor:
+	docker-compose build  -t ${PROJECT}/${APP}:${VERSION} executor
+push-executor:
 	docker push ${PROJECT}/${APP}
 run:
-	docker-compose up
+	docker-compose build
+	docker-compose up 
 stop:
 	docker-compose down    

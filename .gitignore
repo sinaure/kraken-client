@@ -1,0 +1,7 @@
+.project
+.pydevproject
+*.key
+__pycache__
+logs
+docker/postgres/shared/data/*.sql
+!postgres/shared/sql/*.sql

@@ -21,6 +21,27 @@ import logging
 
 logging.basicConfig(filename='logs/executor.log', level=logging.DEBUG)
 
+import datetime
+import calendar
+import time
+# takes date and returns nix time
+def date_nix(str_date):
+    return calendar.timegm(str_date.timetuple())
+
+# takes nix time and returns date
+def date_str(nix_time):
+    return datetime.datetime.fromtimestamp(nix_time).strftime('%m, %d, %Y')
+
+# return formatted TradesHistory request data
+def date(start, end, ofs):
+    req_data = {'type': 'all',
+                'trades': 'true',
+                'start': str(date_nix(start)),
+                'end': str(date_nix(end)),
+                'ofs': str(ofs)
+                }
+    return req_data
+
 ##### KRAKEN ROUTES #####
 @app.route('/addOrder', methods=['POST'])
 def addOrder():
@@ -68,18 +89,23 @@ def cancelOrder():
 
 @app.route('/balance', methods=['GET'])
 def getBalance():
-    balance = k.query_private('Balance')
+    balance = kraken.query_private('Balance')
     
-    if(balance['error'] is not None):
-        return balance['error']
-    
-    return balance['result']   
+    return balance 
 
 @app.route('/openOrders', methods=['GET'])
 def getOpenOrders():
     openOrders = kraken.query_private('OpenOrders')
     
     return openOrders  
+
+@app.route('/tradesHistory', methods=['GET'])
+def getTradesHistory():
+    now = datetime.now()
+    start = now - timedelta(days=1)
+    tradesHistory = kraken.query_private('TradesHistory', {'type': 'all'})
+    
+    return tradesHistory  
 
 
 from flask_cors import CORS
